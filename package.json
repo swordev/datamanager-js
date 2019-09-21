@@ -1,0 +1,60 @@
+{
+	"name": "@swordev/datamanager",
+	"version": "1.0.0",
+	"keywords": [
+		"dataview",
+		"arraybuffer",
+		"typedarray",
+		"binary",
+		"ejson",
+		"json",
+		"typescript"
+	],
+	"homepage": "https://github.com/swordev/datamanager-js.git",
+	"bugs": {
+		"url": "https://github.com/swordev/datamanager-js.git/issues",
+		"email": "juanrgm743@gmail.com"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "Juanra Gálvez",
+		"email": "juanrgm743@gmail.com",
+		"url": "https://github.com/juanrgm"
+	},
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/swordev/datamanager-js.git"
+	},
+	"scripts": {
+		"release": "npm run format:check && npm run clean && npm run changelog && npm run build && npm test && npm run prepare-release && npm run working-dir:check",
+		"changelog": "auto-changelog -p",
+		"prepare-release": "shx mkdir ./release/ && shx cp -r CHANGELOG.md package-lock.json package.json ./lib/src/* ./release/",
+		"format:check": "eclint check * \"src/**/*\" \"test/**/*\"",
+		"format": "eclint fix * \"src/**/*\" \"test/**/*\"",
+		"working-dir:check": "git diff-index --quiet HEAD -- || (echo Working dir is not clean: && git status -s && exit 1)",
+		"clean": "shx rm -rf ./lib/ ./release/",
+		"build": "npm run build:ts",
+		"dev": "concurrently --kill-others \"npm run dev:ts\"",
+		"test": "mocha lib/test/index.js",
+		"build:ts": "tsc -p tsconfig.json",
+		"dev:ts": "tsc -p tsconfig.json -w"
+	},
+	"devDependencies": {
+		"@types/chai": "^4.2.3",
+		"@types/mocha": "^5.2.7",
+		"auto-changelog": "^1.15.0",
+		"chai": "^4.2.0",
+		"concurrently": "^4.1.2",
+		"eclint": "^2.8.1",
+		"mocha": "^6.2.0",
+		"shx": "^0.3.2",
+		"typescript": "^3.6.3"
+	},
+	"engines": {
+		"node": ">=8.0.0"
+	},
+	"auto-changelog": {
+		"ignoreCommitPattern": "docs: auto-changelog"
+	}
+}
