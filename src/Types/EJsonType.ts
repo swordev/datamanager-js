@@ -1,6 +1,6 @@
 import { Type, DecodeInput, EncodeInput } from "./../DataManager";
 import { StringType } from "./../Types/StringType"
-import { JsonType } from "./../Types/JsonType";
+import { IterationTypeEnum, JsonType } from "./../Types/JsonType";
 
 export class EJsonType implements Type<Object | Array<any> | EJsonType> {
 
@@ -24,11 +24,11 @@ export class EJsonType implements Type<Object | Array<any> | EJsonType> {
 		const object = JsonType.iterate(jsonValue, (value, iterationType, parent, key, ref) => {
 
 			let newValue =
-				(iterationType === 1) ? [] :
-					(iterationType === 2) ? {} :
+				(iterationType === IterationTypeEnum.Array) ? [] :
+					(iterationType === IterationTypeEnum.Object) ? {} :
 						value
 
-			const isObject = iterationType === 0 && typeof value === 'object'
+			const isObject = iterationType === IterationTypeEnum.None && typeof value === 'object'
 
 			if (isObject) {
 				newValue = { [EJsonType.magicKey]: data.encodeValue(value) }
@@ -58,7 +58,7 @@ export class EJsonType implements Type<Object | Array<any> | EJsonType> {
 		const json = JSON.parse(StringType.fromTypedArray(array))
 
 		JsonType.iterate(json, (value, iterationType, parent, key) => {
-			if (iterationType === 2 && EJsonType.magicKey in value) {
+			if (iterationType === IterationTypeEnum.Object && EJsonType.magicKey in value) {
 				parent[key] = data.decodeValue(value[EJsonType.magicKey])
 				return false
 			}

@@ -1,6 +1,12 @@
 import { Type, EncodeInput, DecodeInput } from "./../DataManager";
 import { StringType } from "./../Types/StringType";
 
+export enum IterationTypeEnum {
+	None,
+	Array,
+	Object
+}
+
 export class JsonType implements Type<Object | Array<any>> {
 
 	BYTES_PER_ELEMENT = Uint16Array.BYTES_PER_ELEMENT
@@ -40,7 +46,7 @@ export class JsonType implements Type<Object | Array<any>> {
 		data: any,
 		cb: (
 			value: any,
-			iterationType: 0 | 1 | 2,
+			iterationType: IterationTypeEnum,
 			parent: Object | Array<any> | undefined,
 			key: string | undefined,
 			ref: { value: Object | Array<any> | undefined }
@@ -56,10 +62,10 @@ export class JsonType implements Type<Object | Array<any>> {
 
 			let [value, parent, key, ref] = stack.shift()
 
-			let iterationType: 0 | 1 | 2 =
-				Array.isArray(value) ? 1 :
-					JsonType.isPlainObject(value) ? 2 :
-						0
+			let iterationType: IterationTypeEnum =
+				Array.isArray(value) ? IterationTypeEnum.Array :
+					JsonType.isPlainObject(value) ? IterationTypeEnum.Object :
+						IterationTypeEnum.None
 
 			const cbResult = cb(value, iterationType, parent, key, ref)
 
@@ -68,7 +74,7 @@ export class JsonType implements Type<Object | Array<any>> {
 				firstRef = false
 			}
 
-			if (cbResult === false || iterationType === 0)
+			if (cbResult === false || iterationType === IterationTypeEnum.None)
 				continue
 
 			const newStack: any[] = []
