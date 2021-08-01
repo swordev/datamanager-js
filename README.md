@@ -10,7 +10,7 @@
 ## Installation
 
 ```sh
-npm i @swordev/datamanger
+npm i @swordev/datamanager
 ```
 
 ## Usage
