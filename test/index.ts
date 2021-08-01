@@ -224,6 +224,9 @@ describe('Datamanager.prototype.encode/decode', () => {
 				}
 			},
 			d: {
+				string: 'hello',
+				boolean: true,
+				number: 1,
 				null: null
 			}
 		}]
