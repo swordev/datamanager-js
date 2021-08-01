@@ -35,10 +35,10 @@
 		"working-dir:check": "git diff-index --quiet HEAD -- || (echo Working dir is not clean: && git status -s && exit 1)",
 		"clean": "shx rm -rf ./lib/ ./release/",
 		"build": "npm run build:ts",
-		"dev": "concurrently --kill-others \"npm run dev:ts\"",
+		"watch": "concurrently --kill-others \"npm run watch:ts\"",
 		"test": "mocha lib/test/index.js",
 		"build:ts": "tsc -p tsconfig.json",
-		"dev:ts": "tsc -p tsconfig.json -w"
+		"watch:ts": "tsc -p tsconfig.json -w"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.21",
