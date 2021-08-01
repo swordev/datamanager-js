@@ -1,37 +1,36 @@
-import { DataManager, TypedArray } from "./../src/DataManager"
-import * as TypeConfig from "./../src/TypeConfig"
-import * as Types from "./../src/Types"
-import { assert, expect } from "chai"
+import { DataManager, TypedArray } from "../src/DataManager"
+import * as TypeConfig from "../src/TypeConfig"
+import * as Types from "../src/Types"
 
 describe('DataManager.isArrayTyped', () => {
 
 	it('success', () => {
 
-		assert.isTrue(DataManager.isArrayTyped(new Int8Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Int16Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Int32Array()))
-		assert.isTrue(DataManager.isArrayTyped(new BigInt64Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Uint8Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Uint16Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Uint32Array()))
-		assert.isTrue(DataManager.isArrayTyped(new BigUint64Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Uint8ClampedArray()))
-		assert.isTrue(DataManager.isArrayTyped(new Float32Array()))
-		assert.isTrue(DataManager.isArrayTyped(new Float64Array()))
+		expect(DataManager.isArrayTyped(new Int8Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Int16Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Int32Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new BigInt64Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Uint8Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Uint16Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Uint32Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new BigUint64Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Uint8ClampedArray())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Float32Array())).toBeTruthy()
+		expect(DataManager.isArrayTyped(new Float64Array())).toBeTruthy()
 
 	})
 
 	it('error', () => {
 
-		assert.isFalse(DataManager.isArrayTyped(new DataView(new ArrayBuffer(1))))
-		assert.isFalse(DataManager.isArrayTyped(1))
-		assert.isFalse(DataManager.isArrayTyped(null))
-		assert.isFalse(DataManager.isArrayTyped(undefined))
-		assert.isFalse(DataManager.isArrayTyped(function () { }))
-		assert.isFalse(DataManager.isArrayTyped({}))
-		assert.isFalse(DataManager.isArrayTyped([]))
-		assert.isFalse(DataManager.isArrayTyped('str'))
-		assert.isFalse(DataManager.isArrayTyped(true))
+		expect(DataManager.isArrayTyped(new DataView(new ArrayBuffer(1)))).toBeFalsy()
+		expect(DataManager.isArrayTyped(1)).toBeFalsy()
+		expect(DataManager.isArrayTyped(null)).toBeFalsy()
+		expect(DataManager.isArrayTyped(undefined)).toBeFalsy()
+		expect(DataManager.isArrayTyped(function () { })).toBeFalsy()
+		expect(DataManager.isArrayTyped({})).toBeFalsy()
+		expect(DataManager.isArrayTyped([])).toBeFalsy()
+		expect(DataManager.isArrayTyped('str')).toBeFalsy()
+		expect(DataManager.isArrayTyped(true)).toBeFalsy()
 
 	})
 
@@ -41,25 +40,25 @@ describe('DataManager.offsets', () => {
 
 	it('without byteLength', () => {
 
-		assert.deepEqual(DataManager.offsets([
+		expect(DataManager.offsets([
 			{ BYTES_PER_ELEMENT: Uint8Array.BYTES_PER_ELEMENT, length: 1 },
 			{ BYTES_PER_ELEMENT: Uint16Array.BYTES_PER_ELEMENT, length: 1 },
 			{ BYTES_PER_ELEMENT: Uint32Array.BYTES_PER_ELEMENT, length: 1 }
-		]), { result: [0, 2, 4], byteLength: 8 })
+		])).toMatchObject({ result: [0, 2, 4], byteLength: 8 })
 
 	})
 
 	it('with byteLength', () => {
 
-		assert.deepEqual(DataManager.offsets([
+		expect(DataManager.offsets([
 			{ BYTES_PER_ELEMENT: Uint8Array.BYTES_PER_ELEMENT, length: 5 },
 			{ BYTES_PER_ELEMENT: BigInt64Array.BYTES_PER_ELEMENT, length: 5 }
-		], 3), { result: [3, 8], byteLength: 48 })
+		], 3)).toMatchObject({ result: [3, 8], byteLength: 48 })
 
-		assert.deepEqual(DataManager.offsets([
+		expect(DataManager.offsets([
 			{ BYTES_PER_ELEMENT: Uint8Array.BYTES_PER_ELEMENT, length: 5 },
 			{ BYTES_PER_ELEMENT: BigInt64Array.BYTES_PER_ELEMENT, length: 5 }
-		], 4), { result: [4, 16], byteLength: 56 })
+		], 4)).toMatchObject({ result: [4, 16], byteLength: 56 })
 
 	})
 
@@ -88,7 +87,7 @@ describe('Datamanager.encode/decode', () => {
 			[array.constructor as any, array.length]
 		)
 
-		assert.deepEqual(arrays, DataManager.decode(buffer, decodeData).result)
+		expect(arrays).toMatchObject(DataManager.decode(buffer, decodeData).result)
 
 	})
 
@@ -99,13 +98,15 @@ describe('StringType.toTypedArray', () => {
 
 	it('success', () => {
 
-		assert.deepEqual(
-			Types.StringType.toTypedArray('hello world ♥'),
+		expect(
+			Types.StringType.toTypedArray('hello world ♥')
+		).toMatchObject(
 			new Uint16Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 32, 9829])
 		)
 
-		assert.deepEqual(
+		expect(
 			Types.StringType.toTypedArray('hello world', Uint8Array),
+		).toMatchObject(
 			new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])
 		)
 
@@ -113,7 +114,7 @@ describe('StringType.toTypedArray', () => {
 
 	it('error', () => {
 
-		expect(() => Types.StringType.toTypedArray('hello world ♥', Uint8Array)).to.throw();
+		expect(() => Types.StringType.toTypedArray('hello world ♥', Uint8Array)).toThrow();
 
 	})
 
@@ -123,21 +124,21 @@ describe('JsonType.isPlainObject', () => {
 
 	it('success', () => {
 
-		assert.isTrue(Types.JsonType.isPlainObject({}))
-		assert.isTrue(Types.JsonType.isPlainObject(Object.create({})))
+		expect(Types.JsonType.isPlainObject({})).toBeTruthy()
+		expect(Types.JsonType.isPlainObject(Object.create({}))).toBeTruthy()
 
 	})
 
 	it('error', () => {
 
-		assert.isFalse(Types.JsonType.isPlainObject(null))
-		assert.isFalse(Types.JsonType.isPlainObject(undefined))
-		assert.isFalse(Types.JsonType.isPlainObject(function () { }))
-		assert.isFalse(Types.JsonType.isPlainObject(new function () { }))
-		assert.isFalse(Types.JsonType.isPlainObject(1))
-		assert.isFalse(Types.JsonType.isPlainObject(false))
-		assert.isFalse(Types.JsonType.isPlainObject(''))
-		assert.isFalse(Types.JsonType.isPlainObject([]))
+		expect(Types.JsonType.isPlainObject(null)).toBeFalsy()
+		expect(Types.JsonType.isPlainObject(undefined)).toBeFalsy()
+		expect(Types.JsonType.isPlainObject(function () { })).toBeFalsy()
+		expect(Types.JsonType.isPlainObject(new function () { })).toBeFalsy()
+		expect(Types.JsonType.isPlainObject(1)).toBeFalsy()
+		expect(Types.JsonType.isPlainObject(false)).toBeFalsy()
+		expect(Types.JsonType.isPlainObject('')).toBeFalsy()
+		expect(Types.JsonType.isPlainObject([])).toBeFalsy()
 
 	})
 
@@ -163,7 +164,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			new Float64Array([Math.PI])
 		]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -178,7 +179,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			"hello world"
 		]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -193,7 +194,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			{ text: "hello world" }
 		]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -231,7 +232,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			}
 		}]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -265,7 +266,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			}
 		}])
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -287,7 +288,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			{ date: new Date(1565858125373) }
 		]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
@@ -308,7 +309,7 @@ describe('Datamanager.prototype.encode/decode', () => {
 			JSON.stringify({ title: 'hello world' })
 		]
 
-		assert.deepEqual(dm.decode(dm.encode(data)), data)
+		expect(dm.decode(dm.encode(data))).toMatchObject(data)
 
 	})
 
