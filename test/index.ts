@@ -222,6 +222,9 @@ describe('Datamanager.prototype.encode/decode', () => {
 						new Float64Array([Math.PI])
 					]
 				}
+			},
+			d: {
+				null: null
 			}
 		}]
 

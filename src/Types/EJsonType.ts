@@ -28,7 +28,7 @@ export class EJsonType implements Type<Object | Array<any> | EJsonType> {
 					(iterationType === IterationTypeEnum.Object) ? {} :
 						value
 
-			const isObject = iterationType === IterationTypeEnum.None && typeof value === 'object'
+			const isObject = value && iterationType === IterationTypeEnum.None && typeof value === 'object'
 
 			if (isObject) {
 				newValue = { [EJsonType.magicKey]: data.encodeValue(value) }
