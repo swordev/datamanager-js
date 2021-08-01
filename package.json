@@ -29,7 +29,7 @@
 	"scripts": {
 		"release": "npm run format:check && npm run clean && npm run changelog && npm run build && npm test && npm run prepare-release && npm run working-dir:check",
 		"changelog": "auto-changelog -p",
-		"prepare-release": "shx mkdir ./release/ && shx cp -r CHANGELOG.md package-lock.json package.json ./lib/src/* ./release/",
+		"prepare-release": "shx mkdir ./release/ && shx cp -r *.md package-lock.json package.json ./lib/src/* ./release/",
 		"format:check": "eclint check * \"src/**/*\" \"test/**/*\"",
 		"format": "eclint fix * \"src/**/*\" \"test/**/*\"",
 		"working-dir:check": "git diff-index --quiet HEAD -- || (echo Working dir is not clean: && git status -s && exit 1)",
