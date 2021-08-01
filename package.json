@@ -1,59 +1,59 @@
 {
-	"name": "@swordev/datamanager",
-	"version": "1.0.0",
-	"keywords": [
-		"dataview",
-		"arraybuffer",
-		"typedarray",
-		"binary",
-		"ejson",
-		"json",
-		"typescript"
-	],
-	"homepage": "https://github.com/swordev/datamanager-js.git",
-	"bugs": {
-		"url": "https://github.com/swordev/datamanager-js.git/issues",
-		"email": "juanrgm743@gmail.com"
-	},
-	"license": "MIT",
-	"author": {
-		"name": "Juanra Gálvez",
-		"email": "juanrgm743@gmail.com",
-		"url": "https://github.com/juanrgm"
-	},
-	"main": "index.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/swordev/datamanager-js.git"
-	},
-	"scripts": {
-		"release": "npm run format:check && npm run clean && npm run changelog && npm run build && npm test && npm run prepare-release && npm run working-dir:check",
-		"changelog": "auto-changelog -p",
-		"prepare-release": "shx mkdir ./release/ && shx cp -r *.md package-lock.json package.json ./lib/* ./release/",
-		"format:check": "prettier -c ./src/**/*.ts ./test/**/*.ts",
-		"format": "prettier -w ./src/**/*.ts ./test/**/*.ts",
-		"working-dir:check": "git diff-index --quiet HEAD -- || (echo Working dir is not clean: && git status -s && exit 1)",
-		"clean": "shx rm -rf ./lib/ ./release/",
-		"build": "npm run build:ts",
-		"watch": "concurrently --kill-others \"npm run watch:ts\"",
-		"test": "jest",
-		"build:ts": "tsc -p tsconfig.json",
-		"watch:ts": "tsc -p tsconfig.json -w"
-	},
-	"devDependencies": {
-		"@types/jest": "^26.0.24",
-		"auto-changelog": "^2.3.0",
-		"concurrently": "^6.2.0",
-		"jest": "^27.0.6",
-		"prettier": "^2.3.2",
-		"shx": "^0.3.3",
-		"ts-jest": "^27.0.4",
-		"typescript": "^4.3.5"
-	},
-	"engines": {
-		"node": ">=8.0.0"
-	},
-	"auto-changelog": {
-		"ignoreCommitPattern": "docs: auto-changelog"
-	}
+  "name": "@swordev/datamanager",
+  "version": "1.0.0",
+  "keywords": [
+    "dataview",
+    "arraybuffer",
+    "typedarray",
+    "binary",
+    "ejson",
+    "json",
+    "typescript"
+  ],
+  "homepage": "https://github.com/swordev/datamanager-js.git",
+  "bugs": {
+    "url": "https://github.com/swordev/datamanager-js.git/issues",
+    "email": "juanrgm743@gmail.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Juanra Gálvez",
+    "email": "juanrgm743@gmail.com",
+    "url": "https://github.com/juanrgm"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swordev/datamanager-js.git"
+  },
+  "scripts": {
+    "release": "npm run format:check && npm run clean && npm run changelog && npm run build && npm test && npm run prepare-release && npm run working-dir:check",
+    "changelog": "auto-changelog -p",
+    "prepare-release": "shx mkdir ./release/ && shx cp -r *.md package-lock.json package.json ./lib/* ./release/",
+    "format:check": "prettier -c ./src/**/*.ts ./test/**/*.ts",
+    "format": "prettier -w ./src/**/*.ts ./test/**/*.ts",
+    "working-dir:check": "git diff-index --quiet HEAD -- || (echo Working dir is not clean: && git status -s && exit 1)",
+    "clean": "shx rm -rf ./lib/ ./release/",
+    "build": "npm run build:ts",
+    "watch": "concurrently --kill-others \"npm run watch:ts\"",
+    "test": "jest",
+    "build:ts": "tsc -p tsconfig.json",
+    "watch:ts": "tsc -p tsconfig.json -w"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "auto-changelog": "^2.3.0",
+    "concurrently": "^6.2.0",
+    "jest": "^27.0.6",
+    "prettier": "^2.3.2",
+    "shx": "^0.3.3",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "auto-changelog": {
+    "ignoreCommitPattern": "docs: auto-changelog"
+  }
 }
