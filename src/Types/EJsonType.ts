@@ -1,71 +1,79 @@
 import { Type, DecodeInput, EncodeInput } from "./../DataManager";
-import { StringType } from "./../Types/StringType"
+import { StringType } from "./../Types/StringType";
 import { IterationTypeEnum, JsonType } from "./../Types/JsonType";
 
 export class EJsonType implements Type<Object | Array<any> | EJsonType> {
+  BYTES_PER_ELEMENT = Uint16Array.BYTES_PER_ELEMENT;
+  value: any;
 
-	BYTES_PER_ELEMENT = Uint16Array.BYTES_PER_ELEMENT
-	value: any
+  static magicKey = "\b";
 
-	static magicKey = "\b";
+  constructor(value?: any) {
+    this.value = value;
+  }
 
-	constructor(value?: any) {
-		this.value = value
-	}
+  testEncode(value: any): boolean {
+    return (
+      Array.isArray(value) ||
+      JsonType.isPlainObject(value) ||
+      value instanceof EJsonType
+    );
+  }
 
-	testEncode(value: any): boolean {
-		return Array.isArray(value) || JsonType.isPlainObject(value) || value instanceof EJsonType
-	}
+  encode(data: EncodeInput) {
+    const jsonValue =
+      data.value instanceof EJsonType ? data.value.value : data.value;
 
-	encode(data: EncodeInput) {
+    const object = JsonType.iterate(
+      jsonValue,
+      (value, iterationType, parent, key, ref) => {
+        let newValue =
+          iterationType === IterationTypeEnum.Array
+            ? []
+            : iterationType === IterationTypeEnum.Object
+            ? {}
+            : value;
 
-		const jsonValue = (data.value instanceof EJsonType) ? data.value.value : data.value
+        const isObject =
+          value &&
+          iterationType === IterationTypeEnum.None &&
+          typeof value === "object";
 
-		const object = JsonType.iterate(jsonValue, (value, iterationType, parent, key, ref) => {
+        if (isObject) {
+          newValue = { [EJsonType.magicKey]: data.encodeValue(value) };
+        }
 
-			let newValue =
-				(iterationType === IterationTypeEnum.Array) ? [] :
-					(iterationType === IterationTypeEnum.Object) ? {} :
-						value
+        if (parent) {
+          if (Array.isArray(ref.value)) {
+            ref.value.push(newValue);
+          } else {
+            ref.value[key] = newValue;
+          }
+        }
 
-			const isObject = value && iterationType === IterationTypeEnum.None && typeof value === 'object'
+        ref.value = newValue;
 
-			if (isObject) {
-				newValue = { [EJsonType.magicKey]: data.encodeValue(value) }
-			}
+        if (isObject) return false;
+      }
+    );
 
-			if (parent) {
-				if (Array.isArray(ref.value)) {
-					ref.value.push(newValue)
-				} else {
-					ref.value[key] = newValue
-				}
-			}
+    return StringType.toTypedArray(JSON.stringify(object));
+  }
 
-			ref.value = newValue
+  decode(data: DecodeInput) {
+    const array = data.toTypedArray(Uint16Array);
+    const json = JSON.parse(StringType.fromTypedArray(array));
 
-			if (isObject) return false
+    JsonType.iterate(json, (value, iterationType, parent, key) => {
+      if (
+        iterationType === IterationTypeEnum.Object &&
+        EJsonType.magicKey in value
+      ) {
+        parent[key] = data.decodeValue(value[EJsonType.magicKey]);
+        return false;
+      }
+    });
 
-		})
-
-		return StringType.toTypedArray(JSON.stringify(object))
-
-	}
-
-	decode(data: DecodeInput) {
-
-		const array = data.toTypedArray(Uint16Array)
-		const json = JSON.parse(StringType.fromTypedArray(array))
-
-		JsonType.iterate(json, (value, iterationType, parent, key) => {
-			if (iterationType === IterationTypeEnum.Object && EJsonType.magicKey in value) {
-				parent[key] = data.decodeValue(value[EJsonType.magicKey])
-				return false
-			}
-		})
-
-		return json
-
-	}
-
+    return json;
+  }
 }

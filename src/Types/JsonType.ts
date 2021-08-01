@@ -2,97 +2,83 @@ import { Type, EncodeInput, DecodeInput } from "./../DataManager";
 import { StringType } from "./../Types/StringType";
 
 export enum IterationTypeEnum {
-	None,
-	Array,
-	Object
+  None,
+  Array,
+  Object,
 }
 
 export class JsonType implements Type<Object | Array<any>> {
+  BYTES_PER_ELEMENT = Uint16Array.BYTES_PER_ELEMENT;
 
-	BYTES_PER_ELEMENT = Uint16Array.BYTES_PER_ELEMENT
+  testEncode(value: any): boolean {
+    return Array.isArray(value) || JsonType.isPlainObject(value);
+  }
 
-	testEncode(value: any): boolean {
-		return Array.isArray(value) || JsonType.isPlainObject(value)
-	}
+  encode(data: EncodeInput) {
+    return StringType.toTypedArray(JSON.stringify(data.value));
+  }
 
-	encode(data: EncodeInput) {
-		return StringType.toTypedArray(JSON.stringify(data.value))
-	}
+  decode(data: DecodeInput) {
+    const array = data.toTypedArray(Uint16Array);
+    return JSON.parse(StringType.fromTypedArray(array));
+  }
 
-	decode(data: DecodeInput) {
-		const array = data.toTypedArray(Uint16Array)
-		return JSON.parse(StringType.fromTypedArray(array))
-	}
+  static isPlainObject(value: any): value is Object {
+    if (!value || typeof value !== "object") return false;
 
-	static isPlainObject(value: any): value is Object {
+    let proto = value;
+    let nextProto: any;
 
-		if (!value || typeof value !== 'object')
-			return false
+    while ((nextProto = Object.getPrototypeOf(proto))) {
+      proto = nextProto;
+      if (proto.constructor && proto.constructor !== Object) return false;
+    }
 
-		let proto = value
-		let nextProto: any
+    return proto === Object.prototype;
+  }
 
-		while (nextProto = Object.getPrototypeOf(proto)) {
-			proto = nextProto
-			if (proto.constructor && proto.constructor !== Object)
-				return false
-		}
+  static iterate(
+    data: any,
+    cb: (
+      value: any,
+      iterationType: IterationTypeEnum,
+      parent: Object | Array<any> | undefined,
+      key: string | undefined,
+      ref: { value: Object | Array<any> | undefined }
+    ) => boolean | void
+  ) {
+    const ref: { value: any } = { value: undefined };
+    const stack: any[] = [[data, null, null, ref]];
+    let firstRef = true;
+    let result: any;
 
-		return proto === Object.prototype
+    while (stack.length) {
+      let [value, parent, key, ref] = stack.shift();
 
-	}
+      let iterationType: IterationTypeEnum = Array.isArray(value)
+        ? IterationTypeEnum.Array
+        : JsonType.isPlainObject(value)
+        ? IterationTypeEnum.Object
+        : IterationTypeEnum.None;
 
-	static iterate(
-		data: any,
-		cb: (
-			value: any,
-			iterationType: IterationTypeEnum,
-			parent: Object | Array<any> | undefined,
-			key: string | undefined,
-			ref: { value: Object | Array<any> | undefined }
-		) => boolean | void
-	) {
+      const cbResult = cb(value, iterationType, parent, key, ref);
 
-		const ref: { value: any } = { value: undefined }
-		const stack: any[] = [[data, null, null, ref]]
-		let firstRef = true
-		let result: any
+      if (firstRef) {
+        result = ref.value;
+        firstRef = false;
+      }
 
-		while (stack.length) {
+      if (cbResult === false || iterationType === IterationTypeEnum.None)
+        continue;
 
-			let [value, parent, key, ref] = stack.shift()
+      const newStack: any[] = [];
 
-			let iterationType: IterationTypeEnum =
-				Array.isArray(value) ? IterationTypeEnum.Array :
-					JsonType.isPlainObject(value) ? IterationTypeEnum.Object :
-						IterationTypeEnum.None
+      for (const valueKey in value)
+        newStack.push([value[valueKey], value, valueKey, { value: ref.value }]);
 
-			const cbResult = cb(value, iterationType, parent, key, ref)
+      stack.unshift(...newStack);
+    }
 
-			if (firstRef) {
-				result = ref.value
-				firstRef = false
-			}
-
-			if (cbResult === false || iterationType === IterationTypeEnum.None)
-				continue
-
-			const newStack: any[] = []
-
-			for (const valueKey in value)
-				newStack.push([
-					value[valueKey],
-					value,
-					valueKey,
-					{ value: ref.value }
-				])
-
-			stack.unshift(...newStack)
-
-		}
-
-		return result
-
-	}
-
+    return result;
+  }
 }
